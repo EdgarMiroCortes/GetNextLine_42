@@ -5,101 +5,86 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: emiro-co <emiro-co@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/06/05 18:55:42 by emiro-co          #+#    #+#             */
-/*   Updated: 2023/06/05 19:03:21 by emiro-co         ###   ########.fr       */
+/*   Created: 2023/04/15 01:03:18 by emiro-co          #+#    #+#             */
+/*   Updated: 2023/06/02 09:41:22 by emiro-co         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line_bonus.h"
 
-char	*ft_free(char **str)
+void	*ft_free(char **s, int n)
 {
-	if (*str)
+	if (n == 1)
 	{
-		free(*str);
-		*str = NULL;
-		str = NULL;
+		free(*s);
+		*s = NULL;
 		return (NULL);
 	}
-	return (NULL);
+	if (n == 2)
+	{
+		free(*s);
+		*s = NULL;
+	}
+	if (n == 3)
+	{
+		free(*s);
+		return (NULL);
+	}
+	return (0);
 }
 
-char	*ft_fill(char *temp, int fd)
+char	*ft_read(int fd, char *tmp)
 {
-	char		*buf;
-	int			bytes;
+	ssize_t	nr_byt;
+	char	*buf;
 
 	buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!buf)
-		return (ft_free(&temp));
-	bytes = 1;
-	while (bytes > 0 && !ft_strlen(temp, 2))
+		return (ft_free(&tmp, 3));
+	buf[0] = '\0';
+	nr_byt = 1;
+	while (nr_byt > 0 && ft_strlen(buf, 2) == 0)
 	{
-		bytes = read(fd, buf, BUFFER_SIZE);
-		if (bytes == -1)
+		nr_byt = read(fd, buf, BUFFER_SIZE);
+		if (nr_byt < 0)
 		{
-			ft_free(&buf);
-			return (ft_free(&temp));
+			ft_free(&buf, 2);
+			return (ft_free (&tmp, 1));
 		}
-		if (bytes > 0)
-		{
-			buf[bytes] = '\0';
-			temp = ft_strjoin(temp, buf);
-			if (!temp)
-				return (ft_free(&buf));
-		}
+		buf[nr_byt] = '\0';
+		tmp = ft_strjoin(tmp, buf);
+		if (!tmp)
+			return (ft_free(&buf, 3));
 	}
-	free (buf);
-	return (temp);
-}
-
-char	*ft_get_line(char *temp)
-{
-	char		*line;
-	ssize_t		i;
-
-	i = ft_strlen(temp, 3);
-	if (temp[i] == '\n')
-		line = ft_substr(temp, 0, i + 1);
-	else
-		line = ft_substr(temp, 0, i);
-	return (line);
-}
-
-char	*ft_clean(char *s, char *line)
-{
-	char	*scopy;
-
-	if (ft_strlen(s, 2) && s[ft_strlen(s, 3) + 1])
-	{
-		scopy = s;
-		s = ft_substr(s, ft_strlen(line, 1), ft_strlen(s, 1));
-		if (scopy != NULL)
-			free(scopy);
-		if (s == NULL)
-			return (ft_free(&s));
-	}
-	else
-	{
-		free(s);
-		s = NULL;
-	}
-	return (s);
+	free(buf);
+	return (tmp);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*temp[1024];
-	char		*line;
+	static char		*tmp[1024];
+	ssize_t			i;
+	char			*line;
+	char			*tmp2;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
+		return (ft_free (&tmp[fd], 1));
+	tmp[fd] = ft_read(fd, tmp[fd]);
+	if (!tmp[fd])
 		return (NULL);
-	temp[fd] = ft_fill(temp[fd], fd);
-	if (!temp[fd])
-		return (NULL);
-	line = ft_get_line(temp[fd]);
-	if (line == NULL)
-		return (ft_free(&temp[fd]));
-	temp[fd] = ft_clean(temp[fd], line);
+	if (tmp[fd][0] == '\0')
+		return (ft_free (&tmp[fd], 1));
+	i = ft_strlen(tmp[fd], 3) + ft_strlen(tmp[fd], 2);
+	line = ft_substr(tmp[fd], 0, i);
+	if (!line)
+		return (ft_free (&tmp[fd], 1));
+	if (ft_strlen(line, 2) == 1)
+	{
+		tmp2 = tmp[fd];
+		tmp[fd] = ft_substr(tmp[fd], i, ft_strlen(tmp[fd], 1));
+		free(tmp2);
+	}
+	else
+		ft_free(&tmp[fd], 2);
 	return (line);
 }

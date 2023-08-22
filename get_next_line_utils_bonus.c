@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: emiro-co <emiro-co@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/06/05 18:55:36 by emiro-co          #+#    #+#             */
-/*   Updated: 2023/06/05 18:55:38 by emiro-co         ###   ########.fr       */
+/*   Created: 2023/05/29 12:18:49 by emiro-co          #+#    #+#             */
+/*   Updated: 2023/05/31 18:57:46 by emiro-co         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	return (subs);
 }
 
-char	*ft_strdup(char *s)
+char	*ft_strdup(const char *s)
 {
 	char	*k;
 
